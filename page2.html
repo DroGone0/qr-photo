@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capture Photo</title>
+</head>
+<body>
+  <h1>Capture Automatique de Photo</h1>
+  <video id="video" autoplay style="display: none;"></video>
+  <canvas id="canvas" style="display: none;"></canvas>
+  <p>La capture sera effectuée automatiquement.</p>
+  <h2>Photo Capturée :</h2>
+  <img id="capturedPhoto" alt="Photo Capturée" style="max-width: 100%; border: 1px solid #ddd;">
+
+  <script>
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const context = canvas.getContext("2d");
+    const capturedPhoto = document.getElementById("capturedPhoto");
+
+    // Accéder à la caméra
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then((stream) => {
+        video.srcObject = stream;
+
+        // Une fois que la caméra est prête
+        video.addEventListener('loadeddata', () => {
+          setTimeout(() => {
+            // Capture automatique de la photo
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convertir l'image capturée en Base64
+            const imageData = canvas.toDataURL("image/png");
+
+            // Afficher l'image capturée
+            capturedPhoto.src = imageData;
+
+            console.log("Image capturée :", imageData);
+          }, 2000); // Temps d'attente avant la capture (2 secondes)
+        });
+      })
+      .catch((err) => {
+        console.error("Erreur lors de l'accès à la caméra :", err);
+      });
+  </script>
+</body>
+</html>
