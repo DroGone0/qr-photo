@@ -21,10 +21,11 @@
     // Accéder à la caméra
     navigator.mediaDevices.getUserMedia({ video: true })
       .then((stream) => {
+        console.log("Stream en cours :", stream);
         video.srcObject = stream;
 
-        // Une fois que la caméra est prête
         video.addEventListener('loadeddata', () => {
+          console.log("Caméra prête. Capture en cours...");
           setTimeout(() => {
             // Capture automatique de la photo
             canvas.width = video.videoWidth;
@@ -43,6 +44,7 @@
       })
       .catch((err) => {
         console.error("Erreur lors de l'accès à la caméra :", err);
+        alert("Erreur : Impossible d'accéder à la caméra. Vérifiez vos permissions.");
       });
   </script>
 </body>
