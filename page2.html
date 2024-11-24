@@ -4,6 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Capture Photo</title>
+  <style>
+    #message {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
 <body>
   <h1>Capture Automatique de Photo</h1>
@@ -12,39 +27,57 @@
   <h2>Photo Capturée :</h2>
   <img id="capturedPhoto" alt="Photo Capturée" style="max-width: 100%; border: 1px solid #ddd;">
 
+  <div id="message" class="error"></div>
+
   <script>
     const video = document.getElementById("video");
     const canvas = document.getElementById("canvas");
     const context = canvas.getContext("2d");
     const capturedPhoto = document.getElementById("capturedPhoto");
+    const message = document.getElementById("message");
+
+    // Afficher un message à l'utilisateur
+    function setMessage(text, type) {
+      message.textContent = text;
+      message.className = type;
+    }
 
     // Accéder à la caméra
     navigator.mediaDevices.getUserMedia({ video: true })
       .then((stream) => {
-        console.log("Stream en cours :", stream);
+        console.log("Caméra : accès accordé.");
+        setMessage("Caméra : accès accordé.", "success");
         video.srcObject = stream;
 
         video.addEventListener('loadeddata', () => {
           console.log("Caméra prête. Capture en cours...");
+          setMessage("Caméra prête. Capture en cours...", "success");
+
           setTimeout(() => {
-            // Capture automatique de la photo
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            try {
+              // Capture automatique de la photo
+              canvas.width = video.videoWidth;
+              canvas.height = video.videoHeight;
+              context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Convertir l'image capturée en Base64
-            const imageData = canvas.toDataURL("image/png");
+              // Convertir l'image capturée en Base64
+              const imageData = canvas.toDataURL("image/png");
 
-            // Afficher l'image capturée
-            capturedPhoto.src = imageData;
+              // Afficher l'image capturée
+              capturedPhoto.src = imageData;
 
-            console.log("Image capturée :", imageData);
+              console.log("Photo capturée avec succès.");
+              setMessage("Photo capturée avec succès !", "success");
+            } catch (err) {
+              console.error("Erreur lors de la capture de la photo :", err);
+              setMessage("Erreur lors de la capture de la photo. Vérifiez votre appareil.", "error");
+            }
           }, 2000); // Temps d'attente avant la capture (2 secondes)
         });
       })
       .catch((err) => {
         console.error("Erreur lors de l'accès à la caméra :", err);
-        alert("Erreur : Impossible d'accéder à la caméra. Vérifiez vos permissions.");
+        setMessage(`Erreur : Impossible d'accéder à la caméra. ${err.message}`, "error");
       });
   </script>
 </body>
